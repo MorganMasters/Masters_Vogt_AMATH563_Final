@@ -36,32 +36,41 @@ def mcmove(config, beta):
 #%% change these parameters for a smaller (faster) simulation 
 
 nt      = 88         #  number of temperature points
-N       = 32         #  size of the lattice, N x N
+N       = 4         #  size of the lattice, N x N
 eqSteps = 1024       #  number of MC sweeps for equilibration
-mcSteps = 1024       #  number of MC sweeps for calculation
 
 T = np.linspace(1.53, 3.28, nt)
-E,M,C,X = np.zeros(nt), np.zeros(nt), np.zeros(nt), np.zeros(nt)
-n1, n2  = 1.0/(mcSteps*N*N), 1.0/(mcSteps*mcSteps*N*N) 
-# divide by number of samples, and by system size to get intensive values
 
 #%% MAIN PART OF THE CODE
-data=list()
 
-for i in range(1,11):
-        
+for i in range(1,2):
+    
+    data=list()
+
     for tt in range(nt):
-     #   E1 = M1 = E2 = M2 = 0
         config = initialstate(N)         # initialize random configuration
         iT=1.0/T[tt]; iT2=iT*iT
 
         for j in range(eqSteps):         
-            mcmove(config, iT)           # equilibrate
+            config = mcmove(config, iT)           # equilibrate
             data.append([config,T[tt]])  # keep config/temperature
     
     df=pd.DataFrame(data,columns=['config','temp'])
 
-    x='Ising32_' + str(i) + '.pickle'
+    x='Ising4_' + str(i) + '.pickle'
 
     with open(x, 'wb') as f:
         pickle.dump(df, f)
+
+#%%
+foo = np.zeros((eqSteps,N*N))
+
+for i in range(eqSteps):
+    bar = df.iloc[i+1024][0]
+    
+    foo[i,:] = np.reshape(bar,(1,N*N))
+
+plt.figure()
+plt.imshow(foo,aspect='auto')
+
+#%%
