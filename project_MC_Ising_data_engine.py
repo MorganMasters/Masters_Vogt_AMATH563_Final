@@ -4,11 +4,11 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+
+import scipy
 import pickle
 
 from numpy.random import rand
-
-from pprint import pprint
 
 #%% BLOCK OF FUNCTIONS USED IN THE MAIN CODE
 
@@ -35,42 +35,40 @@ def mcmove(config, beta):
 
 #%% change these parameters for a smaller (faster) simulation 
 
-nt      = 88         #  number of temperature points
-N       = 4         #  size of the lattice, N x N
+nt      = 200         #  number of temperature points
+N       = 8          #  size of the lattice, N x N
 eqSteps = 1024       #  number of MC sweeps for equilibration
 
-T = np.linspace(1.53, 3.28, nt)
-
+T = np.linspace(0.05, 5.05, nt)            # pick between 1.53 and 3.28
 #%% MAIN PART OF THE CODE
 
-for i in range(1,2):
+for j in range(1,11):  # simulate 10 experiments
     
-    data=list()
-
-    for tt in range(nt):
-        config = initialstate(N)         # initialize random configuration
-        iT=1.0/T[tt]; iT2=iT*iT
-
-        for j in range(eqSteps):         
-            config = mcmove(config, iT)           # equilibrate
-            data.append([config,T[tt]])  # keep config/temperature
+    df = pd.DataFrame(columns=['State','Temperature'], index=range(nt))
     
-    df=pd.DataFrame(data,columns=['config','temp'])
+    for tt in range(nt):  # equilibrate one configuration per temperature step
+    
+        config = initialstate(N)
+        state = np.reshape(config,(1,N*N))
 
-    x='Ising4_' + str(i) + '.pickle'
+        iT=1.0 / T[tt]
+    
+        for i in range(1,eqSteps):  # equilibrate
+            mcmove(config, iT)
+            state = np.vstack((state, np.reshape(config,(1,N*N))))
+            
+        df.iloc[tt][0] = state
+        df.iloc[tt][1] = T[tt]
 
+        #plt.figure()
+        #plt.imshow(state, aspect='auto')
+        #plt.xlabel('Lattice Site')
+        #plt.ylabel('Time')
+        #plt.show()
+
+    x='Ising_broad_' + str(N) + '_' + str(j) + '.pickle'
+    
     with open(x, 'wb') as f:
-        pickle.dump(df, f)
-
-#%%
-foo = np.zeros((eqSteps,N*N))
-
-for i in range(eqSteps):
-    bar = df.iloc[i+1024][0]
-    
-    foo[i,:] = np.reshape(bar,(1,N*N))
-
-plt.figure()
-plt.imshow(foo,aspect='auto')
+        pickle.dump(df, f)    
 
 #%%

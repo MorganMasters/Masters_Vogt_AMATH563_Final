@@ -1,21 +1,16 @@
 #%%
 from __future__ import division
-
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import pickle
-
 from numpy.random import rand
+import matplotlib.pyplot as plt
 
-from pprint import pprint
-
-#%% BLOCK OF FUNCTIONS USED IN THE MAIN CODE
+#%%  BLOCK OF FUNCTIONS USED IN THE MAIN CODE
 
 def initialstate(N):   
     ''' generates a random spin configuration for initial condition'''
     state = 2*np.random.randint(2, size=(N,N))-1
     return state
+
 
 def mcmove(config, beta):
     '''Monte Carlo move using Metropolis algorithm '''
@@ -33,6 +28,7 @@ def mcmove(config, beta):
                 config[a, b] = s
     return config
 
+
 def calcEnergy(config):
     '''Energy of a given configuration'''
     energy = 0
@@ -42,6 +38,7 @@ def calcEnergy(config):
             nb = config[(i+1)%N, j] + config[i,(j+1)%N] + config[(i-1)%N, j] + config[i,(j-1)%N]
             energy += -nb*S
     return energy/4.
+
 
 def calcMag(config):
     '''Magnetization of a given configuration'''
@@ -55,22 +52,20 @@ N       = 16         #  size of the lattice, N x N
 eqSteps = 1024       #  number of MC sweeps for equilibration
 mcSteps = 1024       #  number of MC sweeps for calculation
 
-T = np.linspace(1.53, 3.28, nt)
+T       = np.linspace(1.53, 3.28, nt); 
 E,M,C,X = np.zeros(nt), np.zeros(nt), np.zeros(nt), np.zeros(nt)
 n1, n2  = 1.0/(mcSteps*N*N), 1.0/(mcSteps*mcSteps*N*N) 
 # divide by number of samples, and by system size to get intensive values
 
-#%% MAIN PART OF THE CODE
-data=list()
+#$$ MAIN PART OF THE CODE
 
 for tt in range(nt):
     E1 = M1 = E2 = M2 = 0
     config = initialstate(N)
-    iT=1.0/T[tt]; iT2=iT*iT
+    iT=1.0/T[tt]; iT2=iT*iT;
     
     for i in range(eqSteps):         # equilibrate
         mcmove(config, iT)           # Monte Carlo moves
-        data.append([config,iT])
 
     for i in range(mcSteps):
         mcmove(config, iT)           
@@ -88,28 +83,25 @@ for tt in range(nt):
     X[tt] = (n1*M2 - n2*M1*M1)*iT
 
 #%%
-f = plt.figure(figsize=(18, 10)) # plot the calculated values    
+f = plt.figure(figsize=(18, 10)); # plot the calculated values    
 
-sp =  f.add_subplot(2, 2, 1 )
+sp =  f.add_subplot(2, 2, 1 );
 plt.scatter(T, E, s=50, marker='o', color='IndianRed')
-plt.xlabel("Temperature (T)", fontsize=20)
-plt.ylabel("Energy ", fontsize=20)         
-plt.axis('tight')
+plt.xlabel("Temperature (T)", fontsize=20);
+plt.ylabel("Energy ", fontsize=20);         plt.axis('tight');
 
-sp =  f.add_subplot(2, 2, 2 )
+sp =  f.add_subplot(2, 2, 2 );
 plt.scatter(T, abs(M), s=50, marker='o', color='RoyalBlue')
-plt.xlabel("Temperature (T)", fontsize=20)
-plt.ylabel("Magnetization ", fontsize=20)
-plt.axis('tight')
+plt.xlabel("Temperature (T)", fontsize=20); 
+plt.ylabel("Magnetization ", fontsize=20);   plt.axis('tight');
 
-sp =  f.add_subplot(2, 2, 3 )
+sp =  f.add_subplot(2, 2, 3 );
 plt.scatter(T, C, s=50, marker='o', color='IndianRed')
-plt.xlabel("Temperature (T)", fontsize=20)
-plt.ylabel("Specific Heat ", fontsize=20) 
-plt.axis('tight')   
+plt.xlabel("Temperature (T)", fontsize=20);  
+plt.ylabel("Specific Heat ", fontsize=20);   plt.axis('tight');   
 
-sp =  f.add_subplot(2, 2, 4 )
+sp =  f.add_subplot(2, 2, 4 );
 plt.scatter(T, X, s=50, marker='o', color='RoyalBlue')
-plt.xlabel("Temperature (T)", fontsize=20) 
-plt.ylabel("Susceptibility", fontsize=20)
-plt.axis('tight')
+plt.xlabel("Temperature (T)", fontsize=20); 
+plt.ylabel("Susceptibility", fontsize=20);   plt.axis('tight');
+
