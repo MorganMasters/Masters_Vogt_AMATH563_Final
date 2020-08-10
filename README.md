@@ -4,7 +4,7 @@
 
 In this project: 
 
-- [x] Synthetic data was generated at evenly-spaced temperatures across [0, 5] Kelvin ([-273.15, -268.15] degrees Celcius) interval.
+- [x] Synthetic data was generated at evenly-spaced temperatures across the interval [0, 5] Kelvin.
 
     - Simulate thermodynamic equilibration of random initial state at each temperatuire via a Monte Carlo method to capture probabilistic behavior.
     
